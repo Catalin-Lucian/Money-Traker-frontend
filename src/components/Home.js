@@ -19,6 +19,7 @@ export default function Home() {
     const [perPage, setPerPage] = useState(10)
 
     const [selectedDeposit, setSelectedDeposit] = useState(-1)
+    const [total, setTotal] = useState(0)
 
 
     // functions
@@ -28,6 +29,7 @@ export default function Home() {
             setDeposits(deposits.filter((deposit) => deposit.id !== id));
             setSelectedDeposit(-1);
             getOperations();
+            getTotal();
         })
     }
 
@@ -38,7 +40,8 @@ export default function Home() {
 
     const handleAddDeposit = (deposit) => {
         axiosInstance.post('/deposits', deposit).then((res) => {
-            setDeposits([...deposits, res.data])
+            setDeposits([...deposits, res.data]);
+            getTotal();
         })
     }
 
@@ -46,6 +49,7 @@ export default function Home() {
         axiosInstance.post('/operations', operation).then((res) => {
             getOperations(selectedDeposit, page);
             getDeposits();
+            getTotal();
         })
     }
 
@@ -60,7 +64,12 @@ export default function Home() {
         getOperations(selectedDeposit, page);
     }
 
-
+    const handleDeleteOperation = (id) => {
+        axiosInstance.delete(`/operations/${id}`).then((res) => {
+            getOperations(selectedDeposit, page);
+            getDeposits();
+        })
+    }
 
     const getOperations = async (depositId = -1, page = 1) => {
         if (depositId === -1) {
@@ -85,12 +94,15 @@ export default function Home() {
         })
     }
 
-    const handleDeleteOperation = (id) => {
-        axiosInstance.delete(`/operations/${id}`).then((res) => {
-            getOperations(selectedDeposit, page);
-            getDeposits();
+    const getTotal = () => {
+        let total = 0;
+        deposits.forEach((deposit) => {
+            total += deposit.amount;
         })
+        setTotal(total);
     }
+
+   
 
 
 
@@ -103,6 +115,10 @@ export default function Home() {
         getOperations()
     }, [])
 
+    useEffect(() => {
+        getTotal()
+    }, [deposits])
+
 
     return (
         // 3 columns: 100px, 1/3, 2/3 using Vstack am grid
@@ -111,6 +127,10 @@ export default function Home() {
             <Flex direction="row" h="80px" bg='gray.700'>
                 <Center ml='10'>
                     <Heading>Money Traker</Heading>
+                </Center>
+                <Spacer />
+                <Center ml='10'>
+                    <Heading color='green.200'>TOTAL BALANCE : {total}$ </Heading>
                 </Center>
                 <Spacer />
                 <Center w="100px" h="80px">
