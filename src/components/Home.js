@@ -35,7 +35,9 @@ export default function Home() {
 
     const handleDepositSelect = (id) => {
        setSelectedDeposit(id);
-       getOperations(id, page);
+       getOperations(id, 1);
+       setPage(1);
+
     }
 
     const handleAddDeposit = (deposit) => {
@@ -59,7 +61,6 @@ export default function Home() {
     }
 
     const handlePageChange = (page) => {
-        console.log("home change page",page);
         setPage(page);
         getOperations(selectedDeposit, page);
     }
@@ -76,14 +77,12 @@ export default function Home() {
             axiosInstance.get('/operations',{params: {page, perPage}}).then((res) =>{
                 setOperations(res.data.operations);
                 setTotalPages(res.data.nrPages);
-                setPage(1);
             })
         }
         else{
             axiosInstance.get(`/operations/${depositId}`,{params: {page, perPage}}).then((res) =>{
                 setOperations(res.data.operations);
                 setTotalPages(res.data.nrPages);
-                setPage(1);
             })
         }
     }
