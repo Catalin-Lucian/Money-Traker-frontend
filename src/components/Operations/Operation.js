@@ -3,7 +3,7 @@ import { Center, Flex } from "@chakra-ui/react";
 import OperationHeader from './OperationHeader';
 import OperationDisplay from './OperationDisplay';
 
-export default function Operation({ operations, deposits, onAddOperation, onDeleteOperation}) {
+export default function Operation({ operations, deposits, page, totalPages, onAddOperation, onDeleteOperation, onChangePage}) {
 
 
     return (
@@ -11,7 +11,10 @@ export default function Operation({ operations, deposits, onAddOperation, onDele
             <Flex direction="column" h="100%" w="100%">
                 <OperationHeader 
                     deposits={deposits}
-                    onAddOperation={onAddOperation} />
+                    page={page}
+                    totalPages={totalPages}
+                    onAddOperation={onAddOperation}
+                    onChangePage={onChangePage} />
                 <OperationDisplay 
                     operations={operations}
                     onDeleteOperation={onDeleteOperation}/>

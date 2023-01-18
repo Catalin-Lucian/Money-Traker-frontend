@@ -26,13 +26,14 @@ export default function Home() {
         console.log("delete "+id);
         axiosInstance.delete(`/deposits/${id}`).then((res) => {
             setDeposits(deposits.filter((deposit) => deposit.id !== id));
+            setSelectedDeposit(-1);
             getOperations();
         })
     }
 
     const handleDepositSelect = (id) => {
        setSelectedDeposit(id);
-       getOperations(id);
+       getOperations(id, page);
     }
 
     const handleAddDeposit = (deposit) => {
@@ -43,7 +44,7 @@ export default function Home() {
 
     const handleAddOperation = (operation) => {
         axiosInstance.post('/operations', operation).then((res) => {
-            getOperations(selectedDeposit);
+            getOperations(selectedDeposit, page);
             getDeposits();
         })
     }
@@ -53,17 +54,27 @@ export default function Home() {
         window.location.reload();
     }
 
+    const handlePageChange = (page) => {
+        console.log("home change page",page);
+        setPage(page);
+        getOperations(selectedDeposit, page);
+    }
 
 
-    const getOperations = async (depositId = -1) => {
+
+    const getOperations = async (depositId = -1, page = 1) => {
         if (depositId === -1) {
             axiosInstance.get('/operations',{params: {page, perPage}}).then((res) =>{
-                setOperations(res.data);
+                setOperations(res.data.operations);
+                setTotalPages(res.data.nrPages);
+                setPage(1);
             })
         }
         else{
             axiosInstance.get(`/operations/${depositId}`,{params: {page, perPage}}).then((res) =>{
-                setOperations(res.data);
+                setOperations(res.data.operations);
+                setTotalPages(res.data.nrPages);
+                setPage(1);
             })
         }
     }
@@ -76,7 +87,7 @@ export default function Home() {
 
     const handleDeleteOperation = (id) => {
         axiosInstance.delete(`/operations/${id}`).then((res) => {
-            getOperations(selectedDeposit);
+            getOperations(selectedDeposit, page);
             getDeposits();
         })
     }
@@ -138,7 +149,10 @@ export default function Home() {
                             operations={operations}
                             deposits={deposits}
                             onAddOperation={handleAddOperation}
-                            onDeleteOperation={handleDeleteOperation} />
+                            onDeleteOperation={handleDeleteOperation} 
+                            page = {page}
+                            totalPages = {totalPages}
+                            onChangePage={handlePageChange} />
                     </Flex>
 
                 </Center>
