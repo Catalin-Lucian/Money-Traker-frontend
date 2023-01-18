@@ -1,5 +1,5 @@
 import { React } from 'react';
-import { Center, Flex, Spacer } from '@chakra-ui/react';
+import { Center, Flex } from '@chakra-ui/react';
 
 import DepositHeader from './DepositHeader';
 import DepositDisplay from './DepositDisplay';

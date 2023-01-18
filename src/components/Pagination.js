@@ -1,7 +1,7 @@
 import {
     Flex, Text, Button
 } from '@chakra-ui/react';
-import React, { useState } from 'react';
+import React from 'react';
 
 export default function Pagination ({page, totalPages, OnChangePage}) {
 
