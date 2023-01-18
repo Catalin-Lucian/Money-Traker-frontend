@@ -11,10 +11,10 @@ export default function DepositDisplay({ deposits, onDeleteDeposit, onSelectDepo
     const handleSelect = (id) => {
         if (selectedDeposits.includes(id)) {
             setSelectedDeposits(selectedDeposits.filter((d) => d !== id));
-            onSelectDeposit(id, false);
+            onSelectDeposit(-1);
         } else {
             setSelectedDeposits([id]);
-            onSelectDeposit(id, true);
+            onSelectDeposit(id);
         }
     };
 

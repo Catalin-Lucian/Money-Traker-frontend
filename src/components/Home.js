@@ -1,11 +1,12 @@
 import {
-    Flex, Center, Text, Spacer, Divider
+    Flex, Center, Box, Spacer, Divider, Heading,IconButton
 } from '@chakra-ui/react';
 import { React, useEffect, useState } from 'react';
 import { ColorModeSwitcher } from '../ColorModeSwitcher';
 import Deposit from './Deposits/Deposit';
 import axiosInstance from '../utils/jwt.interceptor';
 import Operation from './Operations/Operation';
+import { LockIcon } from '@chakra-ui/icons';
 
 
 
@@ -15,21 +16,23 @@ export default function Home() {
 
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
-    const [nr_per_page, setNrPerPage] = useState(10)
+    const [perPage, setPerPage] = useState(10)
+
+    const [selectedDeposit, setSelectedDeposit] = useState(-1)
 
 
     // functions
     const handleDepositDelete = (id) => {
         console.log("delete "+id);
         axiosInstance.delete(`/deposits/${id}`).then((res) => {
-            setDeposits(deposits.filter((deposit) => deposit.id !== id))
+            setDeposits(deposits.filter((deposit) => deposit.id !== id));
+            getOperations();
         })
     }
 
     const handleDepositSelect = (id) => {
-        console.log('select '+id)
-        
-
+       setSelectedDeposit(id);
+       getOperations(id);
     }
 
     const handleAddDeposit = (deposit) => {
@@ -38,47 +41,92 @@ export default function Home() {
         })
     }
 
+    const handleAddOperation = (operation) => {
+        axiosInstance.post('/operations', operation).then((res) => {
+            getOperations(selectedDeposit);
+            getDeposits();
+        })
+    }
+
+    const handleLogOut = () => {
+        localStorage.removeItem('token');
+        window.location.reload();
+    }
 
 
 
-     // useEffects
-     useEffect(() => {
+    const getOperations = async (depositId = -1) => {
+        if (depositId === -1) {
+            axiosInstance.get('/operations',{params: {page, perPage}}).then((res) =>{
+                setOperations(res.data);
+            })
+        }
+        else{
+            axiosInstance.get(`/operations/${depositId}`,{params: {page, perPage}}).then((res) =>{
+                setOperations(res.data);
+            })
+        }
+    }
+    
+    const getDeposits = async () => {
         axiosInstance.get('/deposits').then((res) =>{
             setDeposits(res.data);
         })
+    }
+
+    const handleDeleteOperation = (id) => {
+        axiosInstance.delete(`/operations/${id}`).then((res) => {
+            getOperations(selectedDeposit);
+            getDeposits();
+        })
+    }
+
+
+
+    // useEffects
+    useEffect(() => {
+        getDeposits()
     }, [])
 
     useEffect(() => {
-        axiosInstance.get('/operations',{page, nr_per_page}).then((res) =>{
-            setOperations(res.data);
-        })
+        getOperations()
     }, [])
-
 
 
     return (
         // 3 columns: 100px, 1/3, 2/3 using Vstack am grid
-        <Flex direction="column" h="100vh">
+        <Flex direction="column" h="100vh" overflow='hidden'>
 
-            <Flex direction="row" h="80px" bg="gray.100">
-                <Center w="100px" h="80px" bg="green.200">
-                    <Text>Logo</Text>
+            <Flex direction="row" h="80px" bg='gray.700'>
+                <Center ml='10'>
+                    <Heading>Money Traker</Heading>
                 </Center>
                 <Spacer />
-                <Center w="100px" h="80px" bg="green.200">
+                <Center w="100px" h="80px">
                     <ColorModeSwitcher />
                 </Center>
             </Flex>
 
-            <Flex direction="row" h="100%">
+            <Flex direction="row" h="100%" overflow='hidden'>
 
-                <Center w="100px" h="100%" bg="blue.300">
-                    <Text>Side</Text>
+                <Center direction="row" w="50px" h="100%" ml='4'>
+                    <Spacer />
+                    <IconButton
+                                onClick={(e) => {e.stopPropagation(); handleLogOut()}}
+                                variant='outline'
+                                position='absolute'
+                                left="2"
+                                bottom="2"
+                                colorScheme='red'
+                                aria-label="Logout"
+                                borderRadius={20}
+                                icon={<LockIcon />}
+                            />
                 </Center>
 
                 <Center w="100%" h="100%" >
                     {/*2 colums: 30%, 70%  using flex*/}
-                    <Flex direction="row" h="100%" w="100%">
+                    <Flex direction="row" h="100%" w="100%" overflow='hidden'>
 
                         <Deposit 
                             deposits={deposits}
@@ -87,7 +135,10 @@ export default function Home() {
                             onAddDeposit={handleAddDeposit} />
                         <Divider orientation='vertical' />
                         <Operation
-                            operations={operations} />
+                            operations={operations}
+                            deposits={deposits}
+                            onAddOperation={handleAddOperation}
+                            onDeleteOperation={handleDeleteOperation} />
                     </Flex>
 
                 </Center>

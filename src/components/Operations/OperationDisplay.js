@@ -2,7 +2,7 @@ import {React} from 'react';
 import {Center, Box} from "@chakra-ui/react";
 import OperationCard from './OperationCard';
 
-export default function OperationDisplay({ operations }) {
+export default function OperationDisplay({ operations, onDeleteOperation }) {
 
     return (
         <Center w="100%" h="90%" >
@@ -25,8 +25,8 @@ export default function OperationDisplay({ operations }) {
                     },
                 }}
             >
-                {operations.map((operation) => (
-                    <OperationCard key={operation.id} operation={operation} />
+                {operations.reverse().map((operation) => (
+                    <OperationCard  key={operation.id} operation={operation} onDeleteOperation={onDeleteOperation}/>
                 ))}
             </Box>
         </Center>

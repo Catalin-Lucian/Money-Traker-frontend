@@ -1,15 +1,24 @@
-import { React } from 'react';
+import { React,useState } from 'react';
 import {
     Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverBody, Button, Portal, FormControl, FormLabel, Input, IconButton,
-    Center, Spacer
+    Center, Spacer ,Select
 } from '@chakra-ui/react';
 import { Formik, Form } from 'formik';
 import { AddIcon } from '@chakra-ui/icons';
 
 
-export default function OperationHeader({ deposits }) {
-    
+export default function OperationHeader({ deposits, onAddOperation }) {
+    const [deposit_id, setDepositId] = useState('')
+    const [amount, setAmount] = useState('')
 
+
+    const handleAddOperation = (e) => {
+        e.preventDefault()
+        
+        setAmount('')
+        setDepositId('')
+        onAddOperation({deposit_id, amount})
+    }
 
     return (
         <Center w="100%" h="10%">
@@ -23,16 +32,20 @@ export default function OperationHeader({ deposits }) {
                             <PopoverArrow />
                             <PopoverBody>
                                 <Formik>
-                                    {/* <Form onSubmit={handleAddDeposit}>
+                                    <Form onSubmit={handleAddOperation}>
                                         <FormControl id="name">
                                             <FormLabel>Deposit name</FormLabel>
-                                            <Input type="text" value={name} required variant='filled'
-                                                onChange={(e) => setName(e.target.value)} />
+                                            <Select placeholder="Select deposit" value={deposit_id} required variant='filled' 
+                                                onChange={e => setDepositId(e.target.value)}>
+                                                {deposits.map((deposit) => (
+                                                    <option key={deposit.id} value={deposit.id}>{deposit.name}</option>
+                                                ))}
+                                            </Select>
                                         </FormControl>
 
                                         <FormControl id="amount">
                                             <FormLabel>Deposit amount</FormLabel>
-                                            <Input type="number" value={amount} required variant='filled' min='0'
+                                            <Input type="number" value={amount} required variant='filled'
                                                 onChange={(e) => setAmount(e.target.value)} />
                                         </FormControl>
                                         <Center>
@@ -41,7 +54,7 @@ export default function OperationHeader({ deposits }) {
                                                     Add
                                             </Button>
                                         </Center>
-                                    </Form> */}
+                                    </Form>
                                 </Formik>
                             </PopoverBody>
                         </PopoverContent>

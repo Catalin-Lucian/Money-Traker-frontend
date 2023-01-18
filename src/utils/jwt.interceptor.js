@@ -20,9 +20,13 @@ axiosInstance.interceptors.response.use(
         return response;
     },
     (error) => {
-        if (error.response?.status in [401, 400]) {
+       
+
+        if ([401, 403].includes(error.response.status)) {
             localStorage.removeItem('token');
             window.location.href = '/auth';
+
+            console.log("got here");
         }
         return Promise.reject(error);
     }
